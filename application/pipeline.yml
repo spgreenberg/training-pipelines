@@ -46,7 +46,7 @@ jobs:
       trigger: true
     - get: pipelines
   - task: unit-test
-    file: ((unit-test-task))
+    file: pipelines/((language))/tasks/unit-test.yml
 
 - name: build
   serial_groups: [version]
@@ -59,7 +59,7 @@ jobs:
       params: {pre: rc}
     - get: pipelines
   - task: build
-    file: ((build-task))
+    file: pipelines/((language))/tasks/build.yml
     params:
       APP_NAME: ((app-name))
       INITIALS: ((initials))
@@ -69,17 +69,25 @@ jobs:
   - put: version
     params: {file: version/version}
 
-# - name: deploy-dev
-#    serial_groups: [version]
-#   plan:
-#   - aggregate:
-#     - get: artifact
-#       passed: [build]
-#     - get: app-source
-#     - get: version
-#       passed: [build]
-#     - get: pipelines
-
+- name: deploy-dev
+  serial_groups: [version]
+  plan:
+  - aggregate:
+    - get: artifact
+      passed: [build]
+      trigger: true
+    - get: app-source
+    - get: version
+      passed: [build]
+    - get: pipelines
+  - task: blue-green-deploy
+    file: pipelines/cf/tasks/blue-green-deploy.yml
+    params:
+      APP_NAME: ((app-name))
+      CF_HOSTNAME: ((initials))
+      CF_API:
+      CF_USER:
+      CF_PWD:  -o $CF_ORG -s $CF_SPACE
 
 - name: major
   serial_groups: [version]
