@@ -84,10 +84,14 @@ jobs:
     file: pipelines/cf/tasks/blue-green-deploy.yml
     params:
       APP_NAME: ((app-name))
-      CF_HOSTNAME: ((initials))
-      CF_API:
-      CF_USER:
-      CF_PWD:  -o $CF_ORG -s $CF_SPACE
+      CF_HOSTNAME: ((cf-dev-hostname))
+      CF_API: ((cf-dev-api))
+      CF_USER: ((cf-user))
+      CF_PWD: ((cf-password))
+      CF_ORG: ((cf-dev-org))
+      CF_SPACE: ((cf-dev-space))
+      CF_DOMAIN: ((cf-dev-domain))
+      CF_MANIFEST: ((cf-dev-manifest))
 
 - name: major
   serial_groups: [version]
